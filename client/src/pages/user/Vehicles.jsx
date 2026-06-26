@@ -51,7 +51,6 @@ const Vehicles = () => {
   const navigate = useNavigate();
   const [isLoading , setIsLoading] = useState(true)
 
-  const BASE_URL = import.meta.env.VITE_PRODUCTION_BACKEND_URL
   //allVariants are set to null when we enter AllVehicles from navbar
 
   let refreshToken = localStorage.getItem('refreshToken')
@@ -61,7 +60,7 @@ const Vehicles = () => {
     dispatch(setVariants(null));
     const fetchData = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/api/user/listAllVehicles`,{
+        const res = await fetch(`/api/user/listAllVehicles`,{
           headers:{'Authorization':`Bearer ${refreshToken},${accessToken}`},
           credentials:'include'
         });
