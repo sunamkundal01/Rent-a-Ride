@@ -14,7 +14,7 @@ const App = express();
 dotenv.config();
 const port = process.env.PORT || 3000;
 const allowedOrigins = [
-  'https://rent-a-ride-two.vercel.app',
+  'https://rent-a-ride-ghl8.onrender.com/',
   'http://localhost:5173'
 ];
 
