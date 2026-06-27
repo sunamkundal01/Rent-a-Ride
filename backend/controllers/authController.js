@@ -163,17 +163,18 @@ export const google = async (req, res, next) => {
     }
     if (user) {
       const { password: hashedPassword, ...rest } = user;
-      const token = Jwt.sign({ id: user._id }, process.env.ACCESS_TOKEN);
+      const accessToken = Jwt.sign({ id: user._id }, process.env.ACCESS_TOKEN, {
+        expiresIn: "15m",
+      });
+      const refreshToken = Jwt.sign({ id: user._id }, process.env.REFRESH_TOKEN, {
+        expiresIn: "7d",
+      });
+      await User.updateOne({ _id: user._id }, { refreshToken });
 
       res
-        .cookie("access_token", token, {
-          httpOnly: true,
-          expires: expireDate,
-          SameSite: "None",
-          Domain: ".vercel.app",
-        })
+        .cookie("access_token", accessToken, { httpOnly: true, expires: expireDate })
         .status(200)
-        .json(rest);
+        .json({ ...rest, accessToken, refreshToken });
     } else {
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
@@ -194,18 +195,19 @@ export const google = async (req, res, next) => {
       const savedUser = await newUser.save();
       const userObject = savedUser.toObject();
 
-      const token = Jwt.sign({ id: newUser._id }, process.env.ACCESS_TOKEN);
+      const accessToken = Jwt.sign({ id: newUser._id }, process.env.ACCESS_TOKEN, {
+        expiresIn: "15m",
+      });
+      const refreshToken = Jwt.sign({ id: newUser._id }, process.env.REFRESH_TOKEN, {
+        expiresIn: "7d",
+      });
+      await User.updateOne({ _id: newUser._id }, { refreshToken });
+
       const { password: hashedPassword2, ...rest } = userObject;
       res
-        .cookie("access_token", token, {
-          httpOnly: true,
-          expires: expireDate,
-          sameSite: "None",
-          secure: true,
-          domain: ".vercel.app",
-        })
+        .cookie("access_token", accessToken, { httpOnly: true, expires: expireDate })
         .status(200)
-        .json(rest);
+        .json({ ...rest, accessToken, refreshToken });
     }
   } catch (error) {
     next(error);

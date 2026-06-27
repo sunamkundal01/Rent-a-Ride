@@ -27,6 +27,11 @@ function OAuth() {
 
       if (res.ok) {
         if (data.isUser) {
+          // store tokens so protected actions (payment, delete, etc.) work
+          if (data.accessToken)
+            localStorage.setItem("accessToken", data.accessToken);
+          if (data.refreshToken)
+            localStorage.setItem("refreshToken", data.refreshToken);
           dispatch(signInSuccess(data));
           navigate("/");
         } else {
